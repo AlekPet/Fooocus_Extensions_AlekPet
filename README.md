@@ -1,5 +1,7 @@
 # Fooocus extensions by AlekPet
 
+> Github Fooocus: [go to fooocus](https://github.com/lllyasviel/Fooocus)
+
 ### List extensions:
 
 | Name               |                      Description                      |                                                                                            Link |
