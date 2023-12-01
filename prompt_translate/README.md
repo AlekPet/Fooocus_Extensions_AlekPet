@@ -1,6 +1,6 @@
-# Prompt tranlsate
+# Prompt translate
 
-![Prompt tranlsate image ](https://raw.githubusercontent.com/AlekPet/Fooocus_Extensions_AlekPet/main/assets/images/image_prompt_translate.jpg)
+![Prompt translate image ](https://raw.githubusercontent.com/AlekPet/Fooocus_Extensions_AlekPet/main/assets/images/image_prompt_translate.jpg)
 
 ### Installation:
 
