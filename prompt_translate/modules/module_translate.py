@@ -1,3 +1,7 @@
+## --- Title: Prompt translte
+## --- Description: Extension for Fooocus, translated prompt to other languages
+## --- Author: AlekPet (https://github.com/AlekPet/Fooocus_Extensions_AlekPet)
+
 from modules.launch_util import is_installed, run_pip
 
 packageName = "deep-translator"
@@ -16,8 +20,6 @@ def translate(prompt, prompt_neg='', srcTrans="auto", toTrans="en"):
         
     if not toTrans:
         toTrans = 'en'
-        
-    print(f"{GREEN}-{prompt}={prompt_neg}={srcTrans}--->{toTrans}{CLEAR}")
 
     tranlate_text_prompt = ''
     if prompt and prompt.strip()!="":
