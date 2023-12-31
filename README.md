@@ -2,7 +2,7 @@
 
 > Github Fooocus: [go to fooocus](https://github.com/lllyasviel/Fooocus)
 
-**[Patcher webui.py](#patcher-webui.py)** automatic install extensions after update Fooocus.
+**[Patcher webui.py](#patcher-webui)** automatic install extensions after update Fooocus.
 
 ## List extensions:
 
@@ -10,7 +10,7 @@
 | :----------------- | :---------------------------------------------------: | ----------------------------------------------------------------------------------------------: |
 | _Prompt translate_ | Translate prompt positive and negative to the Englsih | [Link to git](https://github.com/AlekPet/Fooocus_Extensions_AlekPet/tree/main/prompt_translate) |
 
-## [Patcher webui.py]
+## [Patcher webui]
 
 Install:
 
