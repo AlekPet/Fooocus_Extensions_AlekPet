@@ -3,6 +3,7 @@
 # Github: https://github.com/AlekPet/Fooocus_Extensions_AlekPet
 
 import os
+import datetime
 import shutil
 
 DIR_FOOOCUS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Fooocus")
@@ -127,6 +128,9 @@ def search_and_path():
             # Rename to webui.py and backup original
             if not os.path.exists(os.path.join(DIR_FOOOCUS, "webui_original.py")):
                 shutil.copy(PATH_TO_WEBUI, os.path.join(DIR_FOOOCUS, "webui_original.py"))
+            else:
+                currentDateTime = datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+                shutil.copy(PATH_TO_WEBUI, os.path.join(DIR_FOOOCUS, f"webui_original_{currentDateTime}.py"))
                 
             shutil.move(patchedFileName, PATH_TO_WEBUI)
         
