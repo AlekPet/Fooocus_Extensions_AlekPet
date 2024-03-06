@@ -2,7 +2,7 @@
 
 > Github Fooocus: [go to fooocus](https://github.com/lllyasviel/Fooocus)
 
-**[Patcher webui.py](#patcher-webui)** automatic install extensions after update Fooocus.
+**[Patcher webui.py](#patcher-webuipy)** automatic install extensions after update Fooocus.
 
 ## List extensions:
 
@@ -10,7 +10,15 @@
 | :----------------- | :---------------------------------------------------: | ----------------------------------------------------------------------------------------------: |
 | _Prompt translate_ | Translate prompt positive and negative to the Englsih | [Link to git](https://github.com/AlekPet/Fooocus_Extensions_AlekPet/tree/main/prompt_translate) |
 
-## [Patcher webui]
+## Patcher webui.py
+
+## Reset last original webui.py
+
+1. Install git in your system.
+2. Open in the your Shell (cmd, bash ...)
+3. Input command: git restore --source origin/master PATH_TO_WEBUI_PY\webui.py
+
+**Example:** _git restore --source origin/master E:\Fooocus\Fooocus\webui.py_
 
 Install:
 

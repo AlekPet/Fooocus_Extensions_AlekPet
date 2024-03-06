@@ -11,22 +11,21 @@ PATH_TO_WEBUI = os.path.join(DIR_FOOOCUS, "webui.py")
 
 PATH_OBJ_DATA_PROMPT_TRANSLATE = [
 ["from modules.auth import auth_enabled, check_auth\n", "from modules.module_translate import translate, GoogleTranslator\n"],
-["    execution_start_time = time.perf_counter()", """
-    # Prompt translate AlekPet
+["def get_task(*args):\n", """    # Prompt translate AlekPet
     argsList = list(args)
     toT = argsList.pop() 
     srT = argsList.pop() 
     trans_automate = argsList.pop() 
     trans_enable = argsList.pop() 
-    
+
     if trans_enable:      
         if trans_automate:
-            positive, negative = translate(argsList[0], argsList[1], srT, toT)            
-            argsList[0] = positive
-            argsList[1] = negative
+            positive, negative = translate(argsList[2], argsList[3], srT, toT)            
+            argsList[2] = positive
+            argsList[3] = negative
             
     args = tuple(argsList)
-    # ---\n"""],
+    # end -Prompt translate AlekPet\n"""],
 ["            desc_tab.select(lambda: 'desc', outputs=current_tab, queue=False, _js=down_js, show_progress=False)\n","""
 
             # [start] Prompt trasnlate AlekPet
@@ -81,7 +80,7 @@ PATH_OBJ_DATA_PROMPT_TRANSLATE = [
         adv_trans.change(show_viewtrans, inputs=adv_trans, outputs=[viewstrans])
         # [end] Prompt translate AlekPet\n"""],
 ["        ctrls += ip_ctrls\n", "        ctrls += [translate_enabled, translate_automate, srcTrans, toTrans]\n"],
-["            .then(fn=generate_clicked, inputs=ctrls, outputs=[progress_html, progress_window, progress_gallery, gallery]) \\\n","""            .then(fn=seeTranlateAfterClick, inputs=[adv_trans, prompt, negative_prompt, srcTrans, toTrans], outputs=[p_tr, p_n_tr]) \\\n"""]
+["            .then(fn=generate_clicked, inputs=currentTask, outputs=[progress_html, progress_window, progress_gallery, gallery]) \\\n","""            .then(fn=seeTranlateAfterClick, inputs=[adv_trans, prompt, negative_prompt, srcTrans, toTrans], outputs=[p_tr, p_n_tr]) \\\n"""]
     ]
 
 
@@ -141,8 +140,11 @@ def start_path():
 > Extension: 'Prompt Translate'
 > Author: AlekPet
 > Github: https://github.com/AlekPet/Fooocus_Extensions_AlekPet
+
+> Reset original webui.py:
+https://github.com/AlekPet/Fooocus_Extensions_AlekPet/?tab=readme-ov-file#reset-last-original-webuipy
 === ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ===""")
-    
+
     isOk = search_and_path()
     if isOk == "Ok":
         print("\nPatched successfully!")
