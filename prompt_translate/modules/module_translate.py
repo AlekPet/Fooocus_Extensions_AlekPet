@@ -1,7 +1,9 @@
-## --- Title: Prompt translte
+## --- Title: Prompt translate (Deep-trasnlator)
 ## --- Description: Extension for Fooocus, translated prompt to other languages
 ## --- Author: AlekPet (https://github.com/AlekPet/Fooocus_Extensions_AlekPet)
-import gradio as gr
+
+
+# ------------------ Install modules  ------------------ 
 from modules.launch_util import is_installed, run_pip
 
 packageName = "deep-translator"
@@ -12,26 +14,10 @@ if is_installed(packageName):
 if not is_installed(packageName):
     run_pip(f"install {packageName}", f"Prompt_translate requirement -> {packageName}")
 
-from deep_translator import GoogleTranslator
+# ------------------ end - Install modules  ------------------ 
 
-def translate(prompt, prompt_neg='', srcTrans="auto", toTrans="en"):
-    if not srcTrans:
-        srcTrans = 'auto'
-        
-    if not toTrans:
-        toTrans = 'en'
-
-    tranlate_text_prompt = ''
-    if prompt and prompt.strip()!="":
-        tranlate_text_prompt = GoogleTranslator(source=srcTrans, target=toTrans).translate(prompt) 
-
-    tranlate_text_prompt_neg = ''
-    if prompt_neg and prompt_neg.strip()!="":
-        tranlate_text_prompt_neg = GoogleTranslator(source=srcTrans, target=toTrans).translate(prompt_neg) 
-
-    return [tranlate_text_prompt, tranlate_text_prompt_neg]
-
-###
+# ------------------ Deep-trasnlator  ------------------ 
+import gradio as gr
 import os
 import re
 import json
@@ -40,7 +26,7 @@ import deep_translator
 from deep_translator import (BaiduTranslator,
                              ChatGptTranslator,
                              DeeplTranslator,
-                            #  GoogleTranslator,
+                             GoogleTranslator,
                              LibreTranslator,
                              LingueeTranslator,
                              MyMemoryTranslator,
@@ -74,8 +60,8 @@ def log(*text,desc="[Deep Translator => "):
 
 # Default API Keys variables
 DEFAULT_API_KEYS_SERVICES = {
-    "QcriTranslator": "c8af063b6c350215bc74340e16eebf51",
-    "DetectLanguage": "26838885af95f01110f154dac9d6a235",
+    "QcriTranslator": "5cd1724a228b26704cbcdc47510ded73",
+    "DetectLanguage": "62f0dd4bb7a081b6464d79b424135a42", # new api-key not equal comfyui
 }
 
 # Global variables
@@ -89,8 +75,9 @@ DETECT_LANGS_SUPPORT = {}
 
 # Directory translate node and config file
 dir_translate_node = os.path.dirname(__file__)
-config_path = os.path.join(os.path.abspath(dir_translate_node),"config.json")
-detect_languages_list = os.path.join(os.path.abspath(dir_translate_node),"detect_languages_list.json")
+config_path = os.path.join(os.path.abspath(dir_translate_node), "config.json")
+detect_languages_list = os.path.join(os.path.abspath(dir_translate_node), "detect_languages_list.json")
+
 
 # Check service view and api_key 
 def check_service_view(services_prop={}, service=""):   
@@ -120,6 +107,7 @@ def check_service_view(services_prop={}, service=""):
     log(f"Service: {service} is not showing...")   
     return False
 
+
 # Load config.js file
 if not os.path.exists(config_path):
     print("File config.js file not found! Reinstall extensions! Used default settings!")
@@ -140,7 +128,7 @@ else:
                 CONFIG_SETTINGS = deep_config 
                 
         CONFIG_SERVICES = {s:services_prop[s] for s in CONFIG_SERVICES if check_service_view(services_prop[s], s)}
-# =====
+
 
 # Support languages - detectlanguage
 try:
@@ -203,12 +191,12 @@ def langs_support_func(service):
 
     if service:
         auth_data = {}
-        langs_support = selectService(service)
+        langs_support_data = selectService(service)
         
         if service in CONFIG_SERVICES.keys():            
             auth_data = {keyS:servP for keyS, servP in CONFIG_SERVICES.get(service, {}).items() if keyS in ("api_key", "domain", "use_free_api", "appid", "appkey","client_id","secret_key")}
   
-        return {"langs_service": list(langs_support.keys()), "auth_data": auth_data, "proxies": proxies, "settings":settings}
+        return {"langs_service": list(langs_support_data.keys()), "auth_data": auth_data, "proxies": proxies, "settings":settings}
     
     return {"langs_service": [], "auth_data":{}, "proxies": proxies, "settings":settings}
 
@@ -221,13 +209,18 @@ def dictToText(d):
 
 
 def setComboBoxesSrcTo(service):
+    global langs_support
+    global current_service
+
     service = service_correct_reg.sub("", service)
-    settings = langs_support_func(service)
+    if current_service != service:
+        langs_support = langs_support_func(service)
+        current_service = service
 
-    proxy_data = dictToText(settings.get("proxies")) if isinstance(settings.get("proxies"), dict) else ""
-    auth_data = dictToText(settings.get("auth_data")) if isinstance(settings.get("auth_data"), dict) else ""
+    proxy_data = dictToText(langs_support.get("proxies")) if isinstance(langs_support.get("proxies"), dict) else ""
+    auth_data = dictToText(langs_support.get("auth_data")) if isinstance(langs_support.get("auth_data"), dict) else ""
 
-    return [gr.Dropdown.update(choices=['auto']+settings["langs_service"]), gr.Dropdown.update(choices=settings["langs_service"]),  gr.Textbox.update(value=proxy_data), gr.Textbox.update(value=auth_data)]
+    return [gr.Dropdown.update(choices=['auto']+langs_support["langs_service"]), gr.Dropdown.update(choices=langs_support["langs_service"]),  gr.Textbox.update(value=proxy_data), gr.Textbox.update(value=auth_data)]
 
 
 ### Service translate function
@@ -345,26 +338,28 @@ def isset_languages(text, service, from_translate, langs_support = {}, auth_data
         detect_lang_short = single_detection(text, api_key=detect_lang_api_key)
         detect = list(filter(lambda d: d['code'] == detect_lang_short, DETECT_LANGS_SUPPORT))[0]
 
+        if("langs_service" in langs_support):
+            langs_support = langs_support["langs_service"]
 
-        log(f"[{service}] Detect short: {detect_lang_short}, detect: {detect}, lang support: {len(langs_support.keys())}")  
-    
-        if detect_lang_short and len(detect)>0 and detect.get("name", "") and langs_support:
-            detect_lang_full = detect["name"].lower()
-            langs_support_keys = langs_support.keys()
-            detect_in_base = list(filter(lambda lang: lang.lower() == detect_lang_full or lang.capitalize() == detect_lang_full.capitalize() or lang.lower() == detect_lang_short, langs_support_keys))
-            
-            if detect_in_base:
-                if service in ("QcriTranslator",):
-                    detect_lang_full = detect_lang_full.capitalize()
-    
-                if service in ("PonsTranslator",):
-                    detect_lang_full = detect_lang_short
-                            
-                from_translate = detect_lang_full
-                is_support = True
-                log(f"[Deep Translator> Detect in base: {detect_lang_full}")
-            else:
-                log(f"[Deep Translator>No detect in base: {detect_lang_full}") 
+            log(f"[{service}] Detect short: {detect_lang_short}, detect: {detect}, lang support: {len(langs_support)}")  
+        
+            if detect_lang_short and len(detect)>0 and detect.get("name", "") and langs_support:
+                detect_lang_full = detect["name"].lower()
+                langs_support_keys = langs_support
+                detect_in_base = list(filter(lambda lang: lang.lower() == detect_lang_full or lang.capitalize() == detect_lang_full.capitalize() or lang.lower() == detect_lang_short, langs_support_keys))
+                
+                if detect_in_base:
+                    if service in ("QcriTranslator",):
+                        detect_lang_full = detect_lang_full.capitalize()
+        
+                    if service in ("PonsTranslator",):
+                        detect_lang_full = detect_lang_short
+                                
+                    from_translate = detect_lang_full
+                    is_support = True
+                    log(f"[Deep Translator> Detect in base: {detect_lang_full}")
+                else:
+                    log(f"[Deep Translator>No detect in base: {detect_lang_full}") 
         
     except Exception as e:
         print(f"[Deep Translator] Error detect language: {e}")  
@@ -384,7 +379,7 @@ def deep_translator_function(from_translate, to_translate, add_proxies, proxies,
             if text:          
                 print(f"[Deep Translator] Service: \"{service}\"")                
                 # Proxy prop        
-                if add_proxies == "enable":
+                if add_proxies == True:
                     if isinstance(proxies, (str,)) and proxies.strip() != "":
                          prop_data.update(makeDictText("proxies", proxies, key_val_proxy_reg))
                          
@@ -477,26 +472,35 @@ def makeRequiredFields():
     return params
 
 
-current_service = ""
-proxies = ""
-auth_data = ""
-langs_support = langs_support_func("GoogleTranslator") # selectService("GoogleTranslator")
+# Global variables
+current_service = "GoogleTranslator"
+langs_support = langs_support_func("GoogleTranslator")
 
-def deep_translate_text(from_translate, to_translate, add_proxies, proxies, auth_data, service, text):
+# Function translate text
+def deep_translate_text(from_translate, to_translate, add_proxies, proxies, auth_data, service, text_pos, text_neg):
     # Select service   
     global langs_support
+    global current_service
+
     service = service_correct_reg.sub("", service)
     if current_service != service:
-        langs_support = selectService(service)
+        langs_support = langs_support_func(service)
         current_service = service
+
+    if not from_translate:
+        from_translate = 'auto'
+        
+    if not to_translate:
+        to_translate = 'en'
                     
     # Translate   
-    text_tranlsated = deep_translator_function(from_translate, to_translate, add_proxies, proxies, auth_data, service, text, langs_support)
-    
+    text_tranlsated_pos = deep_translator_function(from_translate, to_translate, add_proxies, proxies, auth_data, service, text_pos, langs_support)
+    text_tranlsated_neg = deep_translator_function(from_translate, to_translate, add_proxies, proxies, auth_data, service, text_neg, langs_support)
+ 
+    return [text_tranlsated_pos, text_tranlsated_neg]
 
-    return text_tranlsated
-###
 
 GREEN = '\033[92m'
 CLEAR = '\033[0m'
 print(f"{GREEN}Prompt translate module AlekPet -> Loaded{CLEAR}")
+# ------------------ end - Deep-trasnlator  ------------------ 

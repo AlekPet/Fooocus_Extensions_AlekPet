@@ -21,40 +21,33 @@ from modules.sdxl_styles import legal_style_names
 from modules.private_logger import get_current_html_path
 from modules.ui_gradio_extensions import reload_javascript
 from modules.auth import auth_enabled, check_auth
-from modules.module_translate import translate, GoogleTranslator, makeRequiredFields, setComboBoxesSrcTo, dictToText
+from modules.module_translate import deep_translate_text, makeRequiredFields, setComboBoxesSrcTo
 from modules.util import is_json
+
+translated_prompts = ["",""]
 
 def get_task(*args):
     # Prompt translate AlekPet
+    global translated_prompts
     argsList = list(args)
     toT = argsList.pop() 
     srT = argsList.pop() 
-    trans_automate = argsList.pop() 
-    trans_enable = argsList.pop() 
+    trans_enable = argsList.pop()
+
+    trans_service = argsList.pop()
+    trans_proxy_enabled = argsList.pop()
+    trans_proxy = argsList.pop()
+    trans_auth_data = argsList.pop()
 
     if trans_enable:      
-        if trans_automate:
-            positive, negative = translate(argsList[2], argsList[3], srT, toT)            
-            argsList[2] = positive
-            argsList[3] = negative
-            
+        positive, negative = deep_translate_text(srT, toT, trans_proxy_enabled, trans_proxy, trans_auth_data, trans_service,  argsList[2], argsList[3])
+        argsList[2] = positive
+        argsList[3] = negative
+        translated_prompts = [positive, negative]
+        
     args = tuple(argsList)
     # end -Prompt translate AlekPet
-    # Prompt translate AlekPet
-    argsList = list(args)
-    toT = argsList.pop() 
-    srT = argsList.pop() 
-    trans_automate = argsList.pop() 
-    trans_enable = argsList.pop() 
 
-    if trans_enable:      
-        if trans_automate:
-            positive, negative = translate(argsList[2], argsList[3], srT, toT)            
-            argsList[2] = positive
-            argsList[3] = negative
-            
-    args = tuple(argsList)
-    # end -Prompt translate AlekPet
     args = list(args)
     args.pop(0)
 
@@ -308,7 +301,6 @@ with shared.gradio_root:
                     with gr.Accordion('Prompt Translate', open=False):
                         with gr.Row():
                             translate_enabled = gr.Checkbox(label='Enable translate', value=False, elem_id='translate_enabled_el')
-                            translate_automate = gr.Checkbox(label='Auto translate "Prompt and Negative prompt" before Generate', value=True, interactive=True, elem_id='translate_enabled_el')
 
                         with gr.Row():
                             translate_service = gr.Dropdown(services[0], value=services[1].get("default"), label='Service', interactive=True)
@@ -327,10 +319,11 @@ with shared.gradio_root:
                         with gr.Box(visible=False) as viewstrans:
                             gr.Markdown('Tranlsated prompt & negative prompt')
                             with gr.Row():
-                                p_tr = gr.Textbox(label='Prompt translate', show_label=False, value='', lines=2, placeholder='Translated text prompt')
+                                p_tr = gr.Textbox(label='Prompt translate', show_label=False, value='', lines=3, container=False, placeholder='Translated text prompt')
 
                             with gr.Row():            
-                                p_n_tr = gr.Textbox(label='Negative Translate', show_label=False, value='', lines=2, placeholder='Translated negative text prompt') 
+                                p_n_tr = gr.Textbox(label='Negative Translate', show_label=False, value='', lines=3, container=False, placeholder='Translated negative text prompt') 
+
 
                         # Proxy and authorization
                         with gr.Accordion('Proxy & Authorization data', open=False):
@@ -683,18 +676,12 @@ with shared.gradio_root:
             .then(fn=lambda: None, _js='refresh_grid_delayed', queue=False, show_progress=False)
         
 
-        # [start] Prompt translate AlekPet
-        def seeTranlateAfterClick(adv_trans, prompt, negative_prompt="", srcTrans="auto", toTrans="en"):
-            if(adv_trans):
-                positive, negative = translate(prompt, negative_prompt, srcTrans, toTrans)
-                return [positive, negative]   
-            return ["", ""]
-        
+        # [start] Prompt translate AlekPet      
         # Select service
         translate_service.change(setComboBoxesSrcTo, inputs=translate_service, outputs=[srcTrans, toTrans, translate_proxy, translate_auth_data])
 
-        gtrans.click(translate, inputs=[prompt, negative_prompt, srcTrans, toTrans], outputs=[prompt, negative_prompt])
-        gtrans.click(translate, inputs=[prompt, negative_prompt, srcTrans, toTrans], outputs=[p_tr, p_n_tr])
+        gtrans.click(deep_translate_text, inputs=[srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt], outputs=[prompt, negative_prompt])
+        gtrans.click(deep_translate_text, inputs=[srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt], outputs=[p_tr, p_n_tr])
         
         change_src_to.click(change_lang, inputs=[srcTrans,toTrans], outputs=[toTrans,srcTrans])
         adv_trans.change(lambda x: gr.update(visible=x), inputs=adv_trans, outputs=viewstrans, queue=False, show_progress=False, _js=switch_js)
@@ -762,7 +749,7 @@ with shared.gradio_root:
             ctrls += [save_metadata_to_images, metadata_scheme]
 
         ctrls += ip_ctrls
-        ctrls += [translate_enabled, translate_automate, srcTrans, toTrans]
+        ctrls += [translate_auth_data, translate_proxy, translate_proxy_enabled, translate_service, translate_enabled, srcTrans, toTrans]
 
         def parse_meta(raw_prompt_txt, is_generating):
             loaded_json = None
@@ -800,7 +787,7 @@ with shared.gradio_root:
             .then(fn=refresh_seed, inputs=[seed_random, image_seed], outputs=image_seed) \
             .then(fn=get_task, inputs=ctrls, outputs=currentTask) \
             .then(fn=generate_clicked, inputs=currentTask, outputs=[progress_html, progress_window, progress_gallery, gallery]) \
-            .then(fn=seeTranlateAfterClick, inputs=[adv_trans, prompt, negative_prompt, srcTrans, toTrans], outputs=[p_tr, p_n_tr]) \
+            .then(fn=lambda adv: (translated_prompts if adv else ["", ""]), inputs=[adv_trans], outputs=[p_tr, p_n_tr]) \
             .then(lambda: (gr.update(visible=True, interactive=True), gr.update(visible=False, interactive=False), gr.update(visible=False, interactive=False), False),
                   outputs=[generate_button, stop_button, skip_button, state_is_generating]) \
             .then(fn=update_history_link, outputs=history_link) \
