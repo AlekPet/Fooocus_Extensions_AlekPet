@@ -290,13 +290,6 @@ with shared.gradio_root:
                     param_tranlsate_proxyes = params.get("proxies")
                     param_tranlsate_auth_data = params.get("auth_data")  
                     param_tranlsate_settings = params.get("settings")
-      
-
-                    def change_lang(src, dest):
-                            if src != 'auto' and src != dest:
-                                return [src, dest]
-                            return ['en','auto']
-
                     
                     with gr.Accordion('Prompt Translate', open=False):
                         with gr.Row():
@@ -676,14 +669,25 @@ with shared.gradio_root:
             .then(fn=lambda: None, _js='refresh_grid_delayed', queue=False, show_progress=False)
         
 
-        # [start] Prompt translate AlekPet      
+        # [start] Prompt translate AlekPet 
+        def translateByClick(srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt):
+            pos, neg = deep_translate_text(srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt)
+
+            return [pos, neg, pos, neg]
+
+        def change_lang(src, dest):
+                if src != 'auto' and src != dest:
+                    return [dest, src]
+                else:
+                    gr.Warning(f"It is impossible to change the language from '{src}' to '{dest}' because one of the languages is selected 'auto' or both languages are the same!")
+                    return [src, dest]
+
         # Select service
         translate_service.change(setComboBoxesSrcTo, inputs=translate_service, outputs=[srcTrans, toTrans, translate_proxy, translate_auth_data])
 
-        gtrans.click(deep_translate_text, inputs=[srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt], outputs=[prompt, negative_prompt])
-        gtrans.click(deep_translate_text, inputs=[srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt], outputs=[p_tr, p_n_tr])
+        gtrans.click(translateByClick, inputs=[srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt], outputs=[prompt, negative_prompt,p_tr, p_n_tr])
         
-        change_src_to.click(change_lang, inputs=[srcTrans,toTrans], outputs=[toTrans,srcTrans])
+        change_src_to.click(change_lang, inputs=[srcTrans,toTrans], outputs=[srcTrans,toTrans])
         adv_trans.change(lambda x: gr.update(visible=x), inputs=adv_trans, outputs=viewstrans, queue=False, show_progress=False, _js=switch_js)
 
         # Proxy checkbox

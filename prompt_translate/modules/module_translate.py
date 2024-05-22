@@ -225,77 +225,77 @@ def setComboBoxesSrcTo(service):
 
 ### Service translate function
 def service_translate(service, text, from_translate="auto", to_translate="en", prop_data={}):
-        translated = "No tranlsate, see ComfyUI console..."
+    translated = ""
+    
+    proxyes = prop_data.get("proxies", {})      
+    auth_data = prop_data.get("auth_data", {})
+    api_key = auth_data.get("api_key", "your_api_key")
+
+    log(f"Translate from={from_translate}, to={to_translate}, prop_data={prop_data}, proxy = {proxyes}")
+    # --- Free ---
+    # Google
+    if service == "GoogleTranslator":
+        translated = GoogleTranslator(source=from_translate, target=to_translate, proxies=proxyes).translate(text)
         
-        proxyes = prop_data.get("proxies", {})      
-        auth_data = prop_data.get("auth_data", {})
-        api_key = auth_data.get("api_key", "your_api_key")
-
-        log(f"Translate from={from_translate}, to={to_translate}, prop_data={prop_data}, proxy = {proxyes}")
-        # --- Free ---
-        # Google
-        if service == "GoogleTranslator":
-            translated = GoogleTranslator(source=from_translate, target=to_translate, proxies=proxyes).translate(text)
-            
-        # MyMemoryTranslator
-        elif service == "MyMemoryTranslator":
-            translated = MyMemoryTranslator(source=from_translate, target=to_translate, proxies=proxyes).translate(text)
-                    
-        # LingueeTranslator and PonsTranslator
-        elif service == "LingueeTranslator" or service == "PonsTranslator":
-            words = list(filter(bool, re.split("[,.!;\s\t]", text)))
-
-            log(f"List words: {', '.join(words)}")
-            if service == "LingueeTranslator":
-                translated = LingueeTranslator(source=from_translate, target=to_translate, proxies=proxyes).translate_words(words) 
-            else:
-                try:
-                    translated = PonsTranslator(source=from_translate, target=to_translate, proxies=proxyes).translate_words(words) 
-                except Exception as err:
-                    print(f"[Deep Translator] Service \"{service}\", it gives an error if words from other languages that do not correspond to the source are used : {err}")
+    # MyMemoryTranslator
+    elif service == "MyMemoryTranslator":
+        translated = MyMemoryTranslator(source=from_translate, target=to_translate, proxies=proxyes).translate(text)
                 
-        # LibreTranslator    
-        elif service == "LibreTranslator":
-            use_free_api = auth_data.get("use_free_api", True)
-            translated = LibreTranslator(source=from_translate, target=to_translate, base_url='"https://libretranslate.com/translate', api_key=api_key, proxies=proxyes).translate(text=text)
+    # LingueeTranslator and PonsTranslator
+    elif service == "LingueeTranslator" or service == "PonsTranslator":
+        words = list(filter(bool, re.split("[,.!;\s\t]", text)))
+
+        log(f"List words: {', '.join(words)}")
+        if service == "LingueeTranslator":
+            translated = LingueeTranslator(source=from_translate, target=to_translate, proxies=proxyes).translate_words(words) 
+        else:
+            try:
+                translated = PonsTranslator(source=from_translate, target=to_translate, proxies=proxyes).translate_words(words) 
+            except Exception as err:
+                print(f"[Deep Translator] Service \"{service}\", it gives an error if words from other languages that do not correspond to the source are used : {err}")
             
-        # --- Need API KEY AND OTHER DATA ---
+    # LibreTranslator    
+    elif service == "LibreTranslator":
+        use_free_api = auth_data.get("use_free_api", True)
+        translated = LibreTranslator(source=from_translate, target=to_translate, base_url='"https://libretranslate.com/translate', api_key=api_key, proxies=proxyes).translate(text=text)
         
-        # DeeplTranslator    
-        elif service == "DeeplTranslator":
-            use_free_api = auth_data.get("use_free_api", True)                
-            translated = DeeplTranslator(api_key=api_key, source=from_translate, target=to_translate, use_free_api=use_free_api, proxies=proxyes).translate(text)
-            
-        # QcriTranslator
-        elif service == "QcriTranslator":
-            domain = auth_data.get("domain", "general")           
-            translated = QcriTranslator(api_key=api_key, source=from_translate, target=to_translate).translate(domain=domain, text=text, proxies=proxyes)
+    # --- Need API KEY AND OTHER DATA ---
+    
+    # DeeplTranslator    
+    elif service == "DeeplTranslator":
+        use_free_api = auth_data.get("use_free_api", True)                
+        translated = DeeplTranslator(api_key=api_key, source=from_translate, target=to_translate, use_free_api=use_free_api, proxies=proxyes).translate(text)
+        
+    # QcriTranslator
+    elif service == "QcriTranslator":
+        domain = auth_data.get("domain", "general")           
+        translated = QcriTranslator(api_key=api_key, source=from_translate, target=to_translate).translate(domain=domain, text=text, proxies=proxyes)
 
-            # BaiduTranslator    
-        elif service == "BaiduTranslator":
-            appid = auth_data.get("appid", "your-appid")
-            appkey = auth_data.get("appkey", "your-appkey")
-            translated = BaiduTranslator(appid=appid, appkey=appkey, source=from_translate, target=to_translate, proxies=proxyes).translate(text)
-            
-        # ChatGptTranslator    
-        elif service == "ChatGptTranslator":                
-            translated = ChatGptTranslator(api_key=api_key, target=to_translate, proxies=proxyes).translate(text=text)
+        # BaiduTranslator    
+    elif service == "BaiduTranslator":
+        appid = auth_data.get("appid", "your-appid")
+        appkey = auth_data.get("appkey", "your-appkey")
+        translated = BaiduTranslator(appid=appid, appkey=appkey, source=from_translate, target=to_translate, proxies=proxyes).translate(text)
+        
+    # ChatGptTranslator    
+    elif service == "ChatGptTranslator":                
+        translated = ChatGptTranslator(api_key=api_key, target=to_translate, proxies=proxyes).translate(text=text)
 
-        # MicrosoftTranslator    
-        elif service == "MicrosoftTranslator":
-            translated = MicrosoftTranslator(api_key=api_key, target=to_translate, proxies=proxyes).translate(text=text)
-                                        
-        # PapagoTranslator    
-        elif service == "PapagoTranslator":
-            client_id = auth_data.get("client_id", "your_client_id")
-            secret_key = auth_data.get("secret_key", "your_secret_key")
-            translated = PapagoTranslator(client_id=client_id, secret_key=secret_key, source=from_translate, target=to_translate, proxies=proxyes).translate(text=text)
-            
-        # YandexTranslator    
-        elif service == "YandexTranslator":
-            translated = YandexTranslator(api_key=api_key).translate(source=from_translate, target=to_translate, text=text, proxies=proxyes)
-                                            
-        return translated
+    # MicrosoftTranslator    
+    elif service == "MicrosoftTranslator":
+        translated = MicrosoftTranslator(api_key=api_key, target=to_translate, proxies=proxyes).translate(text=text)
+                                    
+    # PapagoTranslator    
+    elif service == "PapagoTranslator":
+        client_id = auth_data.get("client_id", "your_client_id")
+        secret_key = auth_data.get("secret_key", "your_secret_key")
+        translated = PapagoTranslator(client_id=client_id, secret_key=secret_key, source=from_translate, target=to_translate, proxies=proxyes).translate(text=text)
+        
+    # YandexTranslator    
+    elif service == "YandexTranslator":
+        translated = YandexTranslator(api_key=api_key).translate(source=from_translate, target=to_translate, text=text, proxies=proxyes)
+                            
+    return translated
 
 
 ### Function get dictinary from text, from auth_data and proxies
@@ -357,12 +357,14 @@ def isset_languages(text, service, from_translate, langs_support = {}, auth_data
                                 
                     from_translate = detect_lang_full
                     is_support = True
-                    log(f"[Deep Translator> Detect in base: {detect_lang_full}")
+                    log(f"Detect in base: {detect_lang_full}")
                 else:
-                    log(f"[Deep Translator>No detect in base: {detect_lang_full}") 
+                    log(f"No detect in base: {detect_lang_full}")
+                    gr.Warning(f"[Deep Translator] The selected language '{detect_lang_full}' is not supported by the service '{service}'!")
         
     except Exception as e:
-        print(f"[Deep Translator] Error detect language: {e}")  
+        print(f"[Deep Translator] Error detect language: {e}") 
+        gr.Warning(f"[Deep Translator] Error detect language: {e}")
     
     
     return (from_translate, is_support, detect)
@@ -398,7 +400,6 @@ def deep_translator_function(from_translate, to_translate, add_proxies, proxies,
                 else:
                     print("[Deep Translator] Authorization input field is empty!")
                     
-       
                 # Detect language
                 tServices = ("DeeplTranslator", "QcriTranslator", "LingueeTranslator", "PonsTranslator", "PapagoTranslator", "BaiduTranslator", "MyMemoryTranslator")
 
@@ -412,14 +413,26 @@ def deep_translator_function(from_translate, to_translate, add_proxies, proxies,
                 
 
                 text_tranlsated = service_translate(service, text, from_translate, to_translate, prop_data)
-                        
+                
                 if not text_tranlsated or text_tranlsated is None:
-                    text_tranlsated = ""
+                    text_tranlsated = text
+                    print("[Deep Translator] Text translated is None, set source text!")
+
+                elif isinstance(text_tranlsated, (str,)) and text_tranlsated.strip() == "":
+                    text_tranlsated = text
+                    print("[Deep Translator] Text translated is empty, set source text!")
+
                 elif isinstance(text_tranlsated, (tuple, list)):
-                    text_tranlsated = " ".join(text_tranlsated)
+                    if len(text_tranlsated):
+                        text_tranlsated = " ".join(text_tranlsated)
+                    else:
+                        print("[Deep Translator] List translated is empty, set source text!")
+                        text_tranlsated = ""
                 
         except Exception as e:
-            print(f"[Deep Translator] Error: {e}")
+            print(f"[Deep Translator] Error translate: {e}")
+            gr.Warning(f"[Deep Translator] Error translate: {e}")
+        
         finally:
             return text_tranlsated
 
@@ -476,6 +489,7 @@ def makeRequiredFields():
 current_service = "GoogleTranslator"
 langs_support = langs_support_func("GoogleTranslator")
 
+
 # Function translate text
 def deep_translate_text(from_translate, to_translate, add_proxies, proxies, auth_data, service, text_pos, text_neg):
     # Select service   
@@ -492,11 +506,23 @@ def deep_translate_text(from_translate, to_translate, add_proxies, proxies, auth
         
     if not to_translate:
         to_translate = 'en'
-                    
+
+    text_tranlsated_pos = None
+    text_tranlsated_neg = None
+    
     # Translate   
-    text_tranlsated_pos = deep_translator_function(from_translate, to_translate, add_proxies, proxies, auth_data, service, text_pos, langs_support)
-    text_tranlsated_neg = deep_translator_function(from_translate, to_translate, add_proxies, proxies, auth_data, service, text_neg, langs_support)
- 
+    if text_pos.strip() != "":
+        text_tranlsated_pos = deep_translator_function(from_translate, to_translate, add_proxies, proxies, auth_data, service, text_pos, langs_support)
+
+    if text_neg.strip() != "":
+        text_tranlsated_neg = deep_translator_function(from_translate, to_translate, add_proxies, proxies, auth_data, service, text_neg, langs_support)
+
+    if text_tranlsated_pos is None or text_tranlsated_pos == "":
+        text_tranlsated_pos = text_pos
+
+    if text_tranlsated_neg is None or text_tranlsated_neg == "":
+        text_tranlsated_neg = text_neg 
+
     return [text_tranlsated_pos, text_tranlsated_neg]
 
 

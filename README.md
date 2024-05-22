@@ -4,6 +4,10 @@
 
 **[Patcher webui.py](#patcher-webuipy)** automatic install extensions after update Fooocus.
 
+# Changelog:
+
+> 2024.05.22 - [Prompt translate] Added other translation services (edit **modules/config.js** for setting!)
+
 ## List extensions:
 
 | Name               |                      Description                      |                                                                                            Link |
@@ -34,6 +38,7 @@ Example run.bat:
 pause
 ```
 
-3. Run run.bat
+3. Place folder **modules** (inside prompt_translate folder) in root Fooocus folder and replace!
+4. Run run.bat
 
 > Note: After applied patches to the webui.py, automatic make backup webui.py named webui_original.py
