@@ -16,7 +16,7 @@ if not is_installed(packageName):
 
 # ------------------ end - Install modules  ------------------ 
 
-# ------------------ Deep-trasnlator  ------------------ 
+# ------------------ Deep-translator  ------------------ 
 import gradio as gr
 import os
 import re
@@ -523,4 +523,4 @@ class PromptTranslate:
 GREEN = '\033[92m'
 CLEAR = '\033[0m'
 print(f"{GREEN}Prompt translate module AlekPet -> Loaded{CLEAR}")
-# ------------------ end - Deep-trasnlator  ------------------ 
+# ------------------ end - Deep-translator  ------------------ 
