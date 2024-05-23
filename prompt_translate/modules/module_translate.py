@@ -16,7 +16,7 @@ if not is_installed(packageName):
 
 # ------------------ end - Install modules  ------------------ 
 
-# ------------------ Deep-translator  ------------------ 
+# ------------------ Deep-trasnlator  ------------------ 
 import gradio as gr
 import os
 import re
@@ -175,13 +175,25 @@ def makeDictText(name_prop, text="", regexp = key_val_reg):
         print(f'[Deep Translator] Error {name_prop} exception: ', e)  
     finally:
         return data
-    
+
 
 class PromptTranslate:
     def __init__(self, serviceDefault = "GoogleTranslator"):
         self.current_service = serviceDefault
         self.langs_support = self.langs_support_func(serviceDefault)
         self.translated_prompts = ["",""]
+
+    def change_lang(self, src, dest):
+            if src != 'auto' and src != dest:
+                return [dest, src]
+            else:
+                gr.Warning(f"It is impossible to change the language from '{src}' to '{dest}' because one of the languages is selected 'auto' or both languages are the same!")
+                return [src, dest]    
+
+    def translateByClick(self, srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt):
+        pos, neg = self.deep_translate_text(srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt)
+        return [pos, neg, pos, neg]        
+
 
     def selectService(self, service):
         if service:
@@ -483,6 +495,64 @@ class PromptTranslate:
                                 "YandexTranslator [api-key]"], {"default": "GoogleTranslator"},)   
             
         return params
+    
+    def createElements(self):
+        with gr.Blocks() as dom:
+            with gr.Row(elem_classes='translate_row'):
+                    params = self.makeRequiredFields()
+                    from_translate = params.get("from_translate")
+                    to_translate = params.get("to_translate")
+                    services = params.get("service")
+
+                    param_tranlsate_proxyes = params.get("proxies")
+                    param_tranlsate_auth_data = params.get("auth_data")  
+                    param_tranlsate_settings = params.get("settings")
+                    
+                    with gr.Accordion('Prompt Translate', open=False):
+                        with gr.Row():
+                            translate_enabled = gr.Checkbox(label='Enable translate', value=False, elem_id='translate_enabled_el')
+
+                        with gr.Row():
+                            translate_service = gr.Dropdown(services[0], value=services[1].get("default"), label='Service', interactive=True)
+
+                        with gr.Row():
+                            gtrans = gr.Button(value="Translate")        
+
+                            srcTrans = gr.Dropdown(from_translate["langs"], value=from_translate["default"], label='From', interactive=True)
+                            toTrans = gr.Dropdown(to_translate["langs"], value=to_translate["default"], label='To', interactive=True)
+                            change_src_to = gr.Button(value="🔃")
+
+                        # See translated prompts
+                        with gr.Row():
+                            adv_trans = gr.Checkbox(label='See translated prompts after click Generate', value=False)          
+                            
+                        with gr.Box(visible=False) as viewstrans:
+                            gr.Markdown('Tranlsated prompt & negative prompt')
+                            with gr.Row():
+                                p_tr = gr.Textbox(label='Prompt translate', show_label=False, value='', lines=3, container=False, placeholder='Translated text prompt')
+
+                            with gr.Row():            
+                                p_n_tr = gr.Textbox(label='Negative Translate', show_label=False, value='', lines=3, container=False, placeholder='Translated negative text prompt') 
+
+
+                        # Proxy and authorization
+                        with gr.Accordion('Proxy & Authorization data', open=False):
+                            # Proxy
+                            with gr.Row():
+                                translate_proxy_enabled = gr.Checkbox(label='Enable proxy', value=param_tranlsate_settings["proxyes_input_in_node"], elem_id='translate_proxy_enable')
+
+                            with gr.Box(visible=translate_proxy_enabled.value) as proxy_settings:
+                                gr.Markdown('Proxy settings')
+                                with gr.Row():
+                                    translate_proxy = gr.Textbox(label='Proxy', show_label=False, value=param_tranlsate_proxyes["value"], lines=6, interactive=True, container=False, placeholder=param_tranlsate_proxyes['placeholder'])
+                            
+                            # Authorization data
+                            with gr.Row():
+                                translate_auth_data = gr.Textbox(label='Authorization data', show_label=True, value=param_tranlsate_auth_data["value"], lines=4, interactive=True, placeholder=param_tranlsate_auth_data['placeholder'])            
+
+
+        return [dom, translate_enabled, translate_service, gtrans, srcTrans, toTrans, change_src_to, adv_trans, p_tr, p_n_tr, translate_proxy_enabled, translate_proxy, translate_auth_data, viewstrans, proxy_settings]
+
 
     # Function translate text
     def deep_translate_text(self, from_translate, to_translate, add_proxies, proxies, auth_data, service, text_pos, text_neg):
@@ -523,4 +593,4 @@ class PromptTranslate:
 GREEN = '\033[92m'
 CLEAR = '\033[0m'
 print(f"{GREEN}Prompt translate module AlekPet -> Loaded{CLEAR}")
-# ------------------ end - Deep-translator  ------------------ 
+# ------------------ end - Deep-trasnlator  ------------------ 
