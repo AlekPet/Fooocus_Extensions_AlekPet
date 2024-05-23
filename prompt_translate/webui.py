@@ -21,14 +21,11 @@ from modules.sdxl_styles import legal_style_names
 from modules.private_logger import get_current_html_path
 from modules.ui_gradio_extensions import reload_javascript
 from modules.auth import auth_enabled, check_auth
-from modules.module_translate import PromptTranslate
 from modules.util import is_json
-
-promptTranslate = PromptTranslate()
-
+from modules.module_translate import PromptTranslate # Prompt translate AlekPet
 
 def get_task(*args):
-    # Prompt translate AlekPet
+    # [start] Prompt translate AlekPet
     argsList = list(args)
     toT = argsList.pop() 
     srT = argsList.pop() 
@@ -46,7 +43,7 @@ def get_task(*args):
         promptTranslate.translated_prompts = [positive, negative]
         
     args = tuple(argsList)
-    # end -Prompt translate AlekPet
+    # [end] Prompt trasnlate AlekPet
 
     args = list(args)
     args.pop(0)
@@ -114,6 +111,10 @@ def generate_clicked(task: worker.AsyncTask):
 
 
 reload_javascript()
+
+# [start] Prompt translate AlekPet
+promptTranslate = PromptTranslate()
+# [end] Prompt trasnlate AlekPet
 
 title = f'Fooocus {fooocus_version.version}'
 
@@ -279,10 +280,10 @@ with shared.gradio_root:
             ip_tab.select(lambda: 'ip', outputs=current_tab, queue=False, _js=down_js, show_progress=False)
             desc_tab.select(lambda: 'desc', outputs=current_tab, queue=False, _js=down_js, show_progress=False)
 
-
             # [start] Prompt trasnlate AlekPet
             dom, translate_enabled, translate_service, gtrans, srcTrans, toTrans, change_src_to, adv_trans, p_tr, p_n_tr, translate_proxy_enabled, translate_proxy, translate_auth_data, viewstrans, proxy_settings = promptTranslate.createElements()
             # [end] Prompt trasnlate AlekPet
+
 
         with gr.Column(scale=1, visible=modules.config.default_advanced_checkbox) as advanced_column:
             with gr.Tab(label='Setting'):
@@ -617,8 +618,7 @@ with shared.gradio_root:
                                  queue=False, show_progress=False) \
             .then(fn=lambda: None, _js='refresh_grid_delayed', queue=False, show_progress=False)
 
-
-       # [start] Prompt translate AlekPet 
+        # [start] Prompt translate AlekPet 
         translate_service.change(promptTranslate.setComboBoxesSrcTo, inputs=translate_service, outputs=[srcTrans, toTrans, translate_proxy, translate_auth_data])
 
         gtrans.click(promptTranslate.translateByClick, inputs=[srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt], outputs=[prompt, negative_prompt,p_tr, p_n_tr])
@@ -627,7 +627,6 @@ with shared.gradio_root:
         adv_trans.change(lambda x: gr.update(visible=x), inputs=adv_trans, outputs=viewstrans, queue=False, show_progress=False, _js=switch_js)
         translate_proxy_enabled.change(lambda x: gr.update(visible=x), inputs=translate_proxy_enabled, outputs=proxy_settings, queue=False, show_progress=False, _js=switch_js)
         # [end] Prompt translate AlekPet
-
 
         def inpaint_mode_change(mode):
             assert mode in modules.flags.inpaint_options
@@ -687,7 +686,10 @@ with shared.gradio_root:
             ctrls += [save_metadata_to_images, metadata_scheme]
 
         ctrls += ip_ctrls
+
+        # [start] Prompt translate AlekPet
         ctrls += [translate_auth_data, translate_proxy, translate_proxy_enabled, translate_service, translate_enabled, srcTrans, toTrans]
+        # [end] Prompt translate AlekPet
 
         def parse_meta(raw_prompt_txt, is_generating):
             loaded_json = None
@@ -725,7 +727,7 @@ with shared.gradio_root:
             .then(fn=refresh_seed, inputs=[seed_random, image_seed], outputs=image_seed) \
             .then(fn=get_task, inputs=ctrls, outputs=currentTask) \
             .then(fn=generate_clicked, inputs=currentTask, outputs=[progress_html, progress_window, progress_gallery, gallery]) \
-            .then(fn=lambda adv: (promptTranslate.translated_prompts if adv else ["", ""]), inputs=[adv_trans], outputs=[p_tr, p_n_tr]) \
+            .then(fn=lambda adv: (promptTranslate.translated_prompts if adv else ['', '']), inputs=[adv_trans], outputs=[p_tr, p_n_tr]) \
             .then(lambda: (gr.update(visible=True, interactive=True), gr.update(visible=False, interactive=False), gr.update(visible=False, interactive=False), False),
                   outputs=[generate_button, stop_button, skip_button, state_is_generating]) \
             .then(fn=update_history_link, outputs=history_link) \

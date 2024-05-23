@@ -20,7 +20,17 @@
 
 1. Install git in your system.
 2. Open in the your Shell (cmd, bash ...)
-3. Input command: git restore --source origin/master PATH_TO_WEBUI_PY\webui.py
+3. Input command:
+
+```bash
+git restore --source origin/master PATH_TO_WEBUI_PY\webui.py
+```
+
+or
+
+```bash
+git restore PATH_TO_WEBUI_PY\webui.py
+```
 
 **Example:** _git restore --source origin/master E:\Fooocus\Fooocus\webui.py_
 
