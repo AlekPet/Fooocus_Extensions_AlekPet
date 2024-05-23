@@ -2,7 +2,7 @@
 
 # Changelog:
 
-> 2024.05.23 - [Prompt translate] Added other translation services and update patcher (edit **modules/config.js** for setting!) ([Note config.js](https://github.com/AlekPet/Fooocus_Extensions_AlekPet/tree/main/prompt_translate#note-settings))
+> 2024.05.23 - [Prompt translate] Added other translation services and update patcher (edit **modules/config.json** for setting!) ([Note config.json](https://github.com/AlekPet/Fooocus_Extensions_AlekPet/tree/main/prompt_translate#note-settings))
 
 ![Prompt translate image ](https://raw.githubusercontent.com/AlekPet/Fooocus_Extensions_AlekPet/main/assets/images/image_prompt_translate.jpg)
 ![Prompt translate image 2 new version](https://raw.githubusercontent.com/AlekPet/Fooocus_Extensions_AlekPet/main/assets/images/image_prompt_translate_2.jpg)
@@ -33,4 +33,4 @@ The extension for translating promts into English (possibly into other languages
 
 ### Note settings:
 
-By default, in the **config.js** file, the option to show services without api is disabled (option **"show_services_no_check_api = false"**), which have **free_api = false** and do not specify **api_key** and other authorization values ​​(depending on the translation service). If you set the value of **show_services_no_check_api: true**, then all services with the value **show_service: true** will be shown.
+By default, in the **config.json** file, the option to show services without api is disabled (option **"show_services_no_check_api = false"**), which have **free_api = false** and do not specify **api_key** and other authorization values ​​(depending on the translation service). If you set the value of **show_services_no_check_api: true**, then all services with the value **show_service: true** will be shown.
