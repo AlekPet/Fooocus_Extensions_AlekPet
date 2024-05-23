@@ -1,6 +1,27 @@
 # Prompt translate
 
+# Changelog:
+
+> 2024.05.23 - [Prompt translate] Added other translation services and update patcher (edit **modules/config.js** for setting!) ([Note config.js](https://github.com/AlekPet/Fooocus_Extensions_AlekPet/tree/main/prompt_translate#note-settings))
+
 ![Prompt translate image ](https://raw.githubusercontent.com/AlekPet/Fooocus_Extensions_AlekPet/main/assets/images/image_prompt_translate.jpg)
+
+### Description:
+
+The extension for translating promts into English (possibly into other languages) supports the following services (not all is free):
+
+- DeeplTranslator
+- QcriTranslator
+- LingueeTranslator
+- PonsTranslator
+- PapagoTranslator
+- BaiduTranslator
+- MyMemoryTranslator
+- GoogleTranslator
+- YandexTranslator
+- ChatGptTranslator
+- LingueeTranslator
+- MicrosoftTranslator
 
 ### Installation:
 

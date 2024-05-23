@@ -6,7 +6,7 @@
 
 # Changelog:
 
-> 2024.05.22 - [Prompt translate] Added other translation services (edit **modules/config.js** for setting!) ([Note config.js](https://github.com/AlekPet/Fooocus_Extensions_AlekPet/tree/main/prompt_translate#note-settings))
+> 2024.05.23 - [Prompt translate] Added other translation services (edit **modules/config.js** for setting!) ([Note config.js](https://github.com/AlekPet/Fooocus_Extensions_AlekPet/tree/main/prompt_translate#note-settings))
 
 ## List extensions:
 
