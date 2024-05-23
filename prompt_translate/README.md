@@ -5,6 +5,7 @@
 > 2024.05.23 - [Prompt translate] Added other translation services and update patcher (edit **modules/config.js** for setting!) ([Note config.js](https://github.com/AlekPet/Fooocus_Extensions_AlekPet/tree/main/prompt_translate#note-settings))
 
 ![Prompt translate image ](https://raw.githubusercontent.com/AlekPet/Fooocus_Extensions_AlekPet/main/assets/images/image_prompt_translate.jpg)
+![Prompt translate image 2 new version](https://raw.githubusercontent.com/AlekPet/Fooocus_Extensions_AlekPet/main/assets/images/image_prompt_translate_2.jpg)
 
 ### Description:
 
