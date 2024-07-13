@@ -191,8 +191,8 @@ class PromptTranslate:
                 return [src, dest]    
 
     def translateByClick(self, srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt):
-        pos, neg = self.deep_translate_text(srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt)
-        return [pos, neg, pos, neg]        
+        pos, neg, detected_lang = self.deep_translate_text(srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt)
+        return [pos, neg, pos, neg, detected_lang]       
 
 
     def selectService(self, service):
@@ -450,7 +450,7 @@ class PromptTranslate:
                 gr.Warning(f"[Deep Translator] Error translate: {e}")
             
             finally:
-                return text_tranlsated
+                return text_tranlsated, from_translate
 
 
     def makeRequiredFields(self):
@@ -573,10 +573,10 @@ class PromptTranslate:
         
         # Translate   
         if text_pos.strip() != "":
-            text_tranlsated_pos = self.deep_translator_function(from_translate, to_translate, add_proxies, proxies, auth_data, service, text_pos, self.langs_support)
+            text_tranlsated_pos, detected_lang = self.deep_translator_function(from_translate, to_translate, add_proxies, proxies, auth_data, service, text_pos, self.langs_support)
 
         if text_neg.strip() != "":
-            text_tranlsated_neg = self.deep_translator_function(from_translate, to_translate, add_proxies, proxies, auth_data, service, text_neg, self.langs_support)
+            text_tranlsated_neg, _ = self.deep_translator_function(from_translate, to_translate, add_proxies, proxies, auth_data, service, text_neg, self.langs_support)
 
         if text_tranlsated_pos is None or text_tranlsated_pos == "":
             text_tranlsated_pos = text_pos
@@ -584,7 +584,7 @@ class PromptTranslate:
         if text_tranlsated_neg is None or text_tranlsated_neg == "":
             text_tranlsated_neg = text_neg
 
-        self.translated_prompts = [text_tranlsated_pos, text_tranlsated_neg]
+        self.translated_prompts = [text_tranlsated_pos, text_tranlsated_neg, detected_lang]
 
         return self.translated_prompts
 

@@ -23,10 +23,10 @@ PATH_OBJ_DATA_PROMPT_TRANSLATE = [
     trans_auth_data = argsList.pop()
 
     if trans_enable:      
-        positive, negative = promptTranslate.deep_translate_text(srT, toT, trans_proxy_enabled, trans_proxy, trans_auth_data, trans_service,  argsList[2], argsList[3])
+        positive, negative, detected_lang = promptTranslate.deep_translate_text(srT, toT, trans_proxy_enabled, trans_proxy, trans_auth_data, trans_service,  argsList[2], argsList[3])
         argsList[2] = positive
         argsList[3] = negative
-        promptTranslate.translated_prompts = [positive, negative]
+        promptTranslate.translated_prompts = [positive, negative, detected_lang]
         
     args = tuple(argsList)
     # [end] Prompt trasnlate AlekPet\n
@@ -39,14 +39,14 @@ PATH_OBJ_DATA_PROMPT_TRANSLATE = [
 ["            .then(fn=lambda: None, _js='refresh_grid_delayed', queue=False, show_progress=False)\n","""\n        # [start] Prompt translate AlekPet 
         translate_service.change(promptTranslate.setComboBoxesSrcTo, inputs=translate_service, outputs=[srcTrans, toTrans, translate_proxy, translate_auth_data])
 
-        gtrans.click(promptTranslate.translateByClick, inputs=[srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt], outputs=[prompt, negative_prompt,p_tr, p_n_tr])
+        gtrans.click(promptTranslate.translateByClick, inputs=[srcTrans, toTrans, translate_proxy_enabled, translate_proxy, translate_auth_data, translate_service, prompt, negative_prompt], outputs=[prompt, negative_prompt,p_tr, p_n_tr, srcTrans])
 
         change_src_to.click(promptTranslate.change_lang, inputs=[srcTrans,toTrans], outputs=[srcTrans,toTrans])
         adv_trans.change(lambda x: gr.update(visible=x), inputs=adv_trans, outputs=viewstrans, queue=False, show_progress=False, _js=switch_js)
         translate_proxy_enabled.change(lambda x: gr.update(visible=x), inputs=translate_proxy_enabled, outputs=proxy_settings, queue=False, show_progress=False, _js=switch_js)
         # [end] Prompt translate AlekPet\n"""],
 ["        ctrls += ip_ctrls\n", """\n        # [start] Prompt translate AlekPet\n        ctrls += [translate_auth_data, translate_proxy, translate_proxy_enabled, translate_service, translate_enabled, srcTrans, toTrans]\n        # [end] Prompt translate AlekPet\n"""],
-["            .then(fn=generate_clicked, inputs=currentTask, outputs=[progress_html, progress_window, progress_gallery, gallery]) \\\n","            .then(fn=lambda adv: (promptTranslate.translated_prompts if adv else ['', '']), inputs=[adv_trans], outputs=[p_tr, p_n_tr]) \\\n"]
+["            .then(fn=generate_clicked, inputs=currentTask, outputs=[progress_html, progress_window, progress_gallery, gallery]) \\\n","            .then(fn=lambda: promptTranslate.translated_prompts[2], inputs=[], outputs=[srcTrans]) \\\n            .then(fn=lambda adv: (promptTranslate.translated_prompts if adv else ['', '']), inputs=[adv_trans], outputs=[p_tr, p_n_tr]) \\\n"]
     ]
 
 
