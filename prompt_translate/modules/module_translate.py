@@ -42,7 +42,7 @@ from deep_translator import (BaiduTranslator,
 empty_str = re.compile('^\s*$', re.I | re.M)
 remove_brackets_reg = re.compile("[\[\]]*")
 key_val_reg = re.compile('^[\w-]+=[^=][.\w-]*$', re.I)
-key_val_proxy_reg = re.compile('^[https]+=[^=]((?:\d{1,3}\.){1,3}\d{1,3}):(\d{1,5})$', re.I)
+key_val_proxy_reg = re.compile(r"^https?=\d{1,3}(?:\.\d{1,3}){3}:\d{1,5}$", re.I)
 service_correct_reg = re.compile("\s*\[.*\]")
 check_proxy_reg = re.compile('\d{1,3}\.\d{1,3}\.\d{1,3}\:\d+')
 
@@ -396,13 +396,16 @@ class PromptTranslate:
             try:
                 if text:          
                     print(f"\033[93m[Deep Translator] \033[92mService: \"{service}\"\033[0m")                
-                    # Proxy prop        
+                    # Proxy prop
                     if add_proxies == True:
                         if isinstance(proxies, (str,)) and proxies.strip() != "":
                             prop_data.update(makeDictText("proxies", proxies, key_val_proxy_reg))
                             
                         elif proxies is None:
                             prop_data.update({"proxies":{k.lower():p  for k, p in CONFIG_PROXYES.items() if k.lower() in ("http", "https") and check_proxy_reg.search(p)}})
+
+                        proxies_info = ", ".join([f"{prop}={val}" for prop, val in prop_data["proxies"].items()])
+                        print(f"\033[93m[Deep Translator] \033[92mProxy is enabled. \033[93mProxies: {proxies_info}\033[0m")
                     else:
                         print("\033[93m[Deep Translator] \033[92mProxy disabled or input field is empty!\033[0m")
 
